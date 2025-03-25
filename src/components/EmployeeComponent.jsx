@@ -1,10 +1,23 @@
 import React, { useState } from 'react'
-import { createEmployee } from '../service/EmployeeService'
-import { useNavigate, useParams } from 'react-router-dom'
+import { createEmployee, getEmployee } from '../service/EmployeeService'
+import { useNavigate, useParams, useEffect } from 'react-router-dom'
+
 
 const EmployeeComponent = () => {
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if(id){
+            getEmployee(id).then((response) => {
+                setFirstName(response.data.firstName);
+                setLastName(response.data.lastName);
+                setEmail(response.data.email);
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }, [id])
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
