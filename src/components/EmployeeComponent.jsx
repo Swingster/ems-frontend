@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
-import { createEmployee, getEmployee } from '../service/EmployeeService'
-import { useNavigate, useParams, useEffect } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { createEmployee, getEmployee, updateEmployee } from '../service/EmployeeService'
+import { useNavigate, useParams } from 'react-router-dom'
 
 
 const EmployeeComponent = () => {
 
     const navigate = useNavigate();
-
+    const {id} = useParams();
+    
     useEffect(() => {
         if(id){
             getEmployee(id).then((response) => {
@@ -17,13 +18,13 @@ const EmployeeComponent = () => {
                 console.error(error);
             });
         }
-    }, [id])
+    })
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
 
-    const {id} = useParams;
+    
 
     function handleFirstName(e){
         setFirstName(e.target.value);
@@ -42,19 +43,33 @@ const EmployeeComponent = () => {
         email:''
     })
 
-    function saveEmployee(e){
+    function saveOrUpdateEmployee(e){
         e.preventDefault();
 
         if(validationForm()){
-            const employee = {firstName, lastName, email}
+
+        const employee = {firstName, lastName, email}
         console.log(employee)
 
-        createEmployee(employee).then((response) => {
-            console.log(response.data);
-            navigate('/employees');
-        });
+            if(id){
+                updateEmployee(id, employee).
+                then((response) => {
+                    console.log(response.data)
+                    navigate('/employees');
+                }).catch((error) => {
+                    console.error(error);
+                })
+            } else {
+                createEmployee(employee).
+                then((response) => {
+                    console.log(response.data);
+                    navigate('/employees');
+                }).catch((error) => {
+                    console.error(error);
+                })
+            }
+        }
     }
-}
 
     function validationForm(){
         let valid = true;
@@ -136,7 +151,7 @@ const EmployeeComponent = () => {
                             {errors.email && <div className='invalid-feedback'> {errors.email}</div>}
                         </div>
                         <button className='btn btn-success mt-3'
-                        onClick={saveEmployee}>Submit</button>
+                        onClick={saveOrUpdateEmployee}>Submit</button>
                     </form>
                 </div>
             </div>

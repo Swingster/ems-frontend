@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import { listEmployees } from '../service/EmployeeService'
-import EmployeeComponent from './EmployeeComponent'
+import { listEmployees, deleteEmployee } from '../service/EmployeeService'
 import { useNavigate } from 'react-router-dom'
 
 const ListEmployeeComponent = () => {
@@ -9,13 +8,17 @@ const ListEmployeeComponent = () => {
 
   const [employees, setEmployees] = useState([])
 
-  useEffect(() => {
-    listEmployees().then((response) => {
+  useEffect(() => { 
+    getAllEmployees()
+}, [])
+
+  function getAllEmployees () {
+     listEmployees().then((response) => {
         setEmployees(response.data)
     }).catch(error => {
         console.error('Error retrieving employees', error)
     })
-}, [])
+  }
 
   function addNewEmployee () {
     navigate ('/add-employee')
@@ -23,6 +26,16 @@ const ListEmployeeComponent = () => {
 
   function updateEmployee (id) {
     navigate(`/edit-employee/${id}`)
+  }
+
+  function removeEmployee (id) {
+    console.log('Deleting employee with id', id)
+
+    deleteEmployee(id).then((response) => {
+        getAllEmployees();
+    }).catch(err => {
+        console.error('Error deleting employee', err);
+    })
   }
  
   return (
@@ -55,6 +68,9 @@ const ListEmployeeComponent = () => {
                                 <button className="btn btn-info btn-primary" 
                                 onClick={() => updateEmployee(employee.id)}>
                                     Edit</button>
+                                <button className="btn btn-danger btn-primary ml-2" 
+                                onClick={() => removeEmployee(employee.id)}>
+                                    Delete</button>
                             </td>
                         </tr>)
                 }
